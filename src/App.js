@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import classNames from 'classnames';
 import './App.scss';
 
 const defaultText = `I'm baby truffaut portland wayfarers fam, post-ironic deep v venmo messenger bag pug butcher flannel brunch plaid hashtag. Succulents readymade craft beer tote bag Brooklyn coloring book meggings hoodie literally selvage master cleanse austin marfa gastropub squid.`;
@@ -21,6 +22,7 @@ const makeDistortionCurve = amount => {
 const App = () => {
   
   const [text, setText] = useState(defaultText);
+  const [loading, setLoading] = useState(false);
   const [sentimentType, setSentimentType] = useState('');
   const [sentimentScore, setSentimentScore] = useState(0);
   const [distortionMultiplier, setDistortionMultiplier] = useState(0);
@@ -37,6 +39,7 @@ const App = () => {
   
   // https://rapidapi.com/twinword/api/twinword-text-analysis-bundle
   const getSentiment = async text => {
+    setLoading(true);
 
     const encodedParams = new URLSearchParams();
     encodedParams.set('text', text);
@@ -54,8 +57,10 @@ const App = () => {
 
     try {
       const response = await axios.request(options);
+      setLoading(false);
       return response.data;
     } catch (error) {
+      setLoading(false);
       return error;
     }
   }
@@ -126,7 +131,7 @@ const App = () => {
               Clear
             </button>
             <button 
-              className="btn btn-primary" 
+              className={classNames('btn btn-primary', loading && 'disabled')} 
               onClick={() => sonify(text)}>
               Sonify
             </button>
