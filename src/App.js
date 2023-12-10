@@ -93,20 +93,24 @@ const App = () => {
 
   const sonify = async text => {
     const sentiment = await getSentiment(text);
-
-    let distortionMultiplier = 0;
     const { type, score } = sentiment;
 
     setSentimentType(type);
     setSentimentScore(score);
 
-    if (type === 'negative') {
-      // invert so that negative sentiment is more distorted
-      distortionMultiplier = score * -100;
-      setDistortionMultiplier(distortionMultiplier);
-    }
+    // score range -1 (negative sentiment) to 1 (positive sentiment)
+    // invert so positive and negative sentiments are reversed
+    let adjustedScore = score * -1;
 
-    distortion.curve = makeDistortionCurve(distortionMultiplier);
+    // adjust score to be positive range from 0 (negative sentiment) to 2 (positive sentiment)
+    adjustedScore += 1;
+
+    // multiply by 100 to get a more noticeable effect
+    adjustedScore *= 100;
+
+    setDistortionMultiplier(adjustedScore);
+
+    distortion.curve = makeDistortionCurve(adjustedScore);
 
     const sentences = text.split('.');
     const words = sentences.map(sentence => sentence.split(' ')).flat().filter(word => word !== '');
